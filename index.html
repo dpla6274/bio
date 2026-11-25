@@ -37,13 +37,13 @@
 
   /* ---------- index tabs ---------- */
   .tabs {
-    position: absolute; left: 97.03%; top: 22.53%; height: 75.1%;
+    position: absolute; left: calc(97.03% - 3px); top: 22.53%; height: 75.1%;
     display: flex; flex-direction: column; justify-content: center; gap: calc(14 * var(--u));
   }
   .tab {
     --w: calc(96 * var(--u)); --adh: calc(90 * var(--u));
     display: flex; align-items: center; justify-content: center;
-    width: var(--w); padding: calc(20 * var(--u)) 0;
+    width: calc(var(--w) + 3px); padding: calc(20 * var(--u)) 0 calc(20 * var(--u)) 3px;
     background: rgb(var(--c)); border-radius: 0 calc(12 * var(--u)) calc(12 * var(--u)) 0;
     transition: transform .2s ease;
   }
@@ -54,8 +54,8 @@
   .tab[data-p="pair"]   { --c: 216 206 178; }
   /* the open page shows its tab's adhesive part lying on the paper */
   .tab.current {
-    width: calc(var(--w) + var(--adh)); margin-left: calc(-1 * var(--adh)); padding-left: var(--adh);
-    background: linear-gradient(90deg, rgb(var(--c) / .6) 0 var(--adh), rgb(var(--c)) var(--adh));
+    width: calc(var(--w) + var(--adh) + 3px); margin-left: calc(-1 * var(--adh)); padding-left: calc(var(--adh) + 3px);
+    background: linear-gradient(90deg, rgb(var(--c) / .6) 0 calc(var(--adh) + 3px), rgb(var(--c)) calc(var(--adh) + 3px));
   }
   @media (hover: hover) { .tab:not(.current):hover { transform: translateX(calc(4 * var(--u))); } }
 
@@ -97,13 +97,14 @@
   .copy.uc { font-size: calc(44 * var(--u)); }
   .copy::before {
     content: ""; position: absolute; z-index: -1; left: -.16em; right: -.16em; top: .02em; bottom: -.12em;
-    background: url("assets/hl2.png") center / 100% 100% no-repeat; opacity: 0;
+    background: url("assets/hl2.png") center / 100% 100% no-repeat;
+    clip-path: inset(0 100% 0 0); transition: clip-path .35s cubic-bezier(.3, .6, .4, 1);
   }
   .copy.uc::before { background-image: url("assets/hl3.png"); }
-  .copy.on::before { opacity: 1; }
+  .copy.on::before { clip-path: inset(0 0 0 0); }
   .copy.on { -webkit-text-stroke: .025em currentColor; }
   @media (hover: hover) {
-    .copy:hover::before { opacity: 1; }
+    .copy:hover::before { clip-path: inset(0 0 0 0); }
     .copy:hover { -webkit-text-stroke: .025em currentColor; }
   }
   .note { font-size: calc(30 * var(--u)); color: #64625e; }
@@ -245,7 +246,8 @@ const postit = document.getElementById("postit");
 const touch = matchMedia("(hover: none)").matches;
 postit.addEventListener("click", () => {
   if (touch && !postit.classList.contains("revealed")) { postit.classList.add("revealed"); return; }
-  location.href = PAIR_URL;
+  window.open(PAIR_URL, "_blank", "noopener");
+  postit.classList.remove("revealed");
 });
 show();
 </script>
