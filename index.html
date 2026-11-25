@@ -30,15 +30,15 @@
     position: relative; width: min(86vw, 82svh * 404 / 506, 600px); aspect-ratio: 404 / 506;
     container-type: inline-size; isolation: isolate;
     transform: translateX(-3%);               /* keep sheet + tabs visually centred */
-    --u: 0.09406cqw;                          /* 1/1000 of the paper width */
+    --u: 0.09389cqw;                          /* 1/1000 of the paper width */
   }
   .photo { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; user-select: none; }
-  .paper { z-index: 2; position: absolute; left: 2.97%; top: 22.53%; width: 94.06%; height: 75.1%; isolation: isolate; }
+  .paper { z-index: 2; position: absolute; left: 3.30%; top: 22.73%; width: 93.89%; height: 75.1%; isolation: isolate; }
 
   /* ---------- index tabs ---------- */
   .tabs {
     --tuck: calc(24 * var(--u));              /* part of every tab hidden under the paper */
-    position: absolute; left: calc(97.03% - var(--tuck)); top: 22.53%; height: 75.1%;
+    position: absolute; left: calc(97.19% - var(--tuck)); top: 22.73%; height: 75.1%;
     display: flex; flex-direction: column; justify-content: center; gap: calc(14 * var(--u));
   }
   .tab {
