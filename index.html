@@ -43,11 +43,12 @@
   }
   .tab {
     --w: calc(96 * var(--u)); --adh: calc(90 * var(--u));
-    position: relative; z-index: 0;
+    position: relative; z-index: 0; transition: transform .2s ease;
     display: flex; align-items: center; justify-content: center;
     width: calc(var(--w) + var(--tuck)); padding: calc(20 * var(--u)) 0 calc(20 * var(--u)) var(--tuck);
     background: rgb(var(--c)); border-radius: 0 calc(12 * var(--u)) calc(12 * var(--u)) 0;
   }
+  @media (hover: hover) { .tab:not(.current):hover { transform: translateX(calc(4 * var(--u))); } }
   .tab img { width: calc(46 * var(--u)); height: auto; display: block; pointer-events: none; }
   .tab[data-p="main"]   { --c: 214 210 196; }
   .tab[data-p="ask"]    { --c: 200 203 206; }
@@ -55,9 +56,9 @@
   .tab[data-p="pair"]   { --c: 216 206 178; }
   /* the open page shows its tab's adhesive part lying on the paper */
   .tab.current {
-    z-index: 3;                               /* stuck on top of the open page */
+    z-index: 3; transition: none;             /* stuck on top of the open page */
     width: calc(var(--w) + var(--adh)); margin-left: calc(var(--tuck) - var(--adh)); padding-left: var(--adh);
-    background: linear-gradient(90deg, rgb(var(--c) / .6) 0 var(--adh), rgb(var(--c)) var(--adh));
+    background: linear-gradient(90deg, rgb(var(--c) / .6) 0 calc(var(--adh) - 3 * var(--u)), rgb(var(--c)) calc(var(--adh) - 3 * var(--u)));
   }
 
   /* ---------- pages ---------- */
