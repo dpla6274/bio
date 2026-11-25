@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>dpla</title>
+<meta name="description" content="dpla">
+<meta property="og:title" content="dpla">
+<meta name="theme-color" content="#000000">
+<link rel="preload" href="assets/sheet.jpg" as="image">
+<link rel="preload" href="assets/griun.woff" as="font" type="font/woff" crossorigin>
+<style>
+  @font-face { font-family: "Griun"; src: url("assets/griun.woff") format("woff"); font-display: swap; }
+  /* full font: only fetched if a character is missing from the subset above */
+  @font-face { font-family: "GriunFull"; src: url("assets/griun-full.woff") format("woff"); font-display: swap; }
+  @font-face { font-family: "Cormorant SBI"; src: url("assets/cormorant-sbi.woff") format("woff"); font-weight: 600; font-style: italic; font-display: swap; }
+
+  :root { --ink: #262428; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; background: #000; }
+  body {
+    min-height: 100svh; display: flex; align-items: center; justify-content: center;
+    font-family: "Griun", "GriunFull", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    color: var(--ink); -webkit-font-smoothing: antialiased; -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
+  }
+
+  /* ---------- sheet: clip + paper photo ---------- */
+  .sheet {
+    position: relative; width: min(86vw, 82svh * 404 / 506, 600px); aspect-ratio: 404 / 506;
+    background: url("assets/sheet.jpg") center / 100% 100% no-repeat;
+    container-type: inline-size; isolation: isolate;
+    transform: translateX(-3%);               /* keep sheet + tabs visually centred */
+    --u: 0.09406cqw;                          /* 1/1000 of the paper width */
+  }
+  .paper { position: absolute; left: 2.97%; top: 22.53%; width: 94.06%; height: 75.1%; isolation: isolate; }
+
+  /* ---------- index tabs ---------- */
+  .tabs {
+    position: absolute; left: 97.03%; top: 22.53%; height: 75.1%;
+    display: flex; flex-direction: column; justify-content: center; gap: calc(14 * var(--u));
+  }
+  .tab {
+    --w: calc(96 * var(--u)); --adh: calc(90 * var(--u));
+    display: flex; align-items: center; justify-content: center;
+    width: var(--w); padding: calc(20 * var(--u)) 0;
+    background: rgb(var(--c)); border-radius: 0 calc(12 * var(--u)) calc(12 * var(--u)) 0;
+    transition: transform .2s ease;
+  }
+  .tab img { width: calc(46 * var(--u)); height: auto; display: block; pointer-events: none; }
+  .tab[data-p="main"]   { --c: 214 210 196; }
+  .tab[data-p="ask"]    { --c: 200 203 206; }
+  .tab[data-p="prompt"] { --c: 205 210 200; }
+  .tab[data-p="pair"]   { --c: 216 206 178; }
+  /* the open page shows its tab's adhesive part lying on the paper */
+  .tab.current {
+    width: calc(var(--w) + var(--adh)); margin-left: calc(-1 * var(--adh)); padding-left: var(--adh);
+    background: linear-gradient(90deg, rgb(var(--c) / .6) 0 var(--adh), rgb(var(--c)) var(--adh));
+  }
+  @media (hover: hover) { .tab:not(.current):hover { transform: translateX(calc(4 * var(--u))); } }
+
+  /* ---------- pages ---------- */
+  .page {
+    position: absolute; inset: 0; display: none; flex-direction: column; justify-content: center;
+    padding: calc(60 * var(--u)) calc(130 * var(--u)) calc(60 * var(--u)) calc(70 * var(--u));
+    mix-blend-mode: multiply;                 /* ink sits in the paper */
+  }
+  .sheet[data-page="main"] .page.main,
+  .sheet[data-page="prompt"] .page.prompt,
+  .sheet[data-page="pair"] .page.pair { display: flex; }
+
+  /* highlighter: real marker-stroke texture behind the text */
+  .hl { position: relative; white-space: nowrap; }
+  .hl::before {
+    content: ""; position: absolute; z-index: -1; left: -.22em; right: -.22em; top: .14em; bottom: -.02em;
+    background: url("assets/hl1.png") center / 100% 100% no-repeat;
+  }
+  .hl.v2::before { background-image: url("assets/hl2.png"); }
+  .hl.v3::before { background-image: url("assets/hl3.png"); }
+
+  /* MAIN */
+  .main { font-size: calc(38 * var(--u)); line-height: 1.55; }
+  .main p + p { margin-top: .7em; }
+
+  /* PROMPT */
+  .prompt ul { list-style: none; }
+  .prompt li {
+    display: flex; align-items: center; justify-content: space-between; height: calc(112 * var(--u));
+    border-bottom: 1px solid rgb(150 148 142 / .75);
+  }
+  .prompt li:last-child, .prompt li.joined { border-bottom: 0; }
+  .prompt .left { display: flex; align-items: baseline; gap: calc(30 * var(--u)); }
+  .copy {
+    font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0;
+    font-size: calc(58 * var(--u)); line-height: 1; position: relative;
+  }
+  .copy.uc { font-size: calc(44 * var(--u)); }
+  .copy::before {
+    content: ""; position: absolute; z-index: -1; left: -.16em; right: -.16em; top: .02em; bottom: -.12em;
+    background: url("assets/hl2.png") center / 100% 100% no-repeat; opacity: 0;
+  }
+  .copy.uc::before { background-image: url("assets/hl3.png"); }
+  .copy.on::before { opacity: 1; }
+  .copy.on { -webkit-text-stroke: .025em currentColor; }
+  @media (hover: hover) {
+    .copy:hover::before { opacity: 1; }
+    .copy:hover { -webkit-text-stroke: .025em currentColor; }
+  }
+  .note { font-size: calc(30 * var(--u)); color: #64625e; }
+
+  /* PAIR */
+  .pair { align-items: center; padding-left: calc(40 * var(--u)); padding-right: calc(130 * var(--u)); }
+  .postit {
+    position: relative; width: calc(600 * var(--u)); aspect-ratio: 946 / 1048; cursor: pointer;
+    background: url("assets/postit.webp") center / 100% 100% no-repeat;
+    transform: rotate(2deg); border: 0; font: inherit; color: inherit;
+  }
+  .postit span {
+    position: absolute; left: 0; right: 0; top: 60%; transform: translateY(-75%);
+    text-align: center; white-space: nowrap; transition: opacity .25s ease;
+  }
+  .postit .kao { font-size: calc(44 * var(--u)); }
+  .postit .pop {
+    font-family: "Cormorant SBI", "Cormorant Garamond", Georgia, serif; font-style: italic; font-weight: 600;
+    font-size: calc(54 * var(--u)); letter-spacing: -.025em; color: #2d2346;
+    text-shadow: 0 0 .5px rgb(45 35 70 / .55); opacity: 0;
+  }
+  .postit.revealed .kao { opacity: 0; } .postit.revealed .pop { opacity: 1; }
+  @media (hover: hover) { .postit:hover .kao { opacity: 0; } .postit:hover .pop { opacity: 1; } }
+
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+</style>
+</head>
+<body>
+<main class="sheet" data-page="main">
+  <div class="paper">
+
+    <section class="page main" aria-label="MAIN">
+      <p><span class="hl">성인 여성</span><br>성인 여성만 받습니다.</p>
+      <p><span class="hl v2">극오픈 | 이입</span><br><span class="hl v3">1T1D 및 추가 온리 배려 X</span><br>탐라 내 자연발생 온리만 배려해 드리는 편입니다.</p>
+      <p>로그, 짤뽑, 제작 +기타<br>케이브덕, 티팟, 유니챗 (+마리나라)<br>고정 페르소나 하나만 사용합니다.</p>
+      <p><span class="hl v2">근친 등 비윤리적 소재 언급 O</span><br>스캇 제외 NG 없습니다.</p>
+      <p>FUB FREE, 재연결 O</p>
+    </section>
+
+    <section class="page prompt" aria-label="PROMPT">
+      <ul>
+        <li><button class="copy" data-k="PERSONA">PERSONA</button><button class="copy uc" data-k="PERSONA_UC">UC</button></li>
+        <li><button class="copy" data-k="VITTORIO">VITTORIO</button><button class="copy uc" data-k="VITTORIO_UC">UC</button></li>
+        <li><button class="copy" data-k="LORENZO">LORENZO</button><button class="copy uc" data-k="LORENZO_UC">UC</button></li>
+        <li class="joined"><button class="copy" data-k="NACHO">NACHO</button><button class="copy uc" data-k="NACHO_UC">UC</button></li>
+        <li><span class="left"><button class="copy" data-k="MARIA">MARIA</button><span class="note">나초방 마리아 옷 포함 통프롬</span></span></li>
+        <li><button class="copy" data-k="KIRILL">KIRILL</button><button class="copy uc" data-k="KIRILL_UC">UC</button></li>
+        <li><button class="copy" data-k="NARUSE">NARUSE</button><button class="copy uc" data-k="NARUSE_UC">UC</button></li>
+      </ul>
+      <p class="sr" aria-live="polite" id="status"></p>
+    </section>
+
+    <section class="page pair" aria-label="PAIR">
+      <button class="postit" id="postit" aria-label="9/22. Assignment begins.">
+        <span class="kao">(*´∀`*)♬ ♥ φ(・ω・｀)</span>
+        <span class="pop">9/22. Assignment begins.</span>
+      </button>
+    </section>
+
+  </div>
+
+  <nav class="tabs">
+    <a class="tab" data-p="main" href="#main"><img src="assets/tab-main.png" alt="MAIN"></a>
+    <a class="tab" data-p="ask" href="https://asked.kr/profile/DDPPLLAA?lang=ko" target="_blank" rel="noopener"><img src="assets/tab-ask.png" alt="ASK"></a>
+    <a class="tab" data-p="prompt" href="#prompt"><img src="assets/tab-prompt.png" alt="PROMPT"></a>
+    <a class="tab" data-p="pair" href="#pair"><img src="assets/tab-pair.png" alt="PAIR"></a>
+  </nav>
+</main>
+
+<script>
+/* ---------- prompt texts (copied on click) ---------- */
+const P = {
+PERSONA: `1 girl,  ::adult, aged up::, mature female, skinny, perfect face, perfect anatomy, long hair, ::straight hair::, 2::blunt bangs::, 2::bangs::, black hair, black eyes, tareme, ::dead eyes::, narrow face, thick eyebrows, straight eyebrows, pale skin, `,
+PERSONA_UC: `shiny eyes, moles, forehead, wide face, tsurime, narrow eyes, curtained bangs, parted hair, hair intake, freckles, spiky hair, messy hair, unnatural hair, wavy hair, curly hair, big breast, thick, muscular, short bangs, tied hair, `,
+VITTORIO: `1 boy,  ::adult, aged up::, mature male, muscular, handsome, perfect face, perfect anatomy, black hair, hair slicked back, slicked back bangs, purple eyes, thin eyebrows, a scar on mouth, short face, 2::tall::, emotionless, 0.1::tan::,
+
+-2::thick eyebrows, forked eyebrows, prominent chin::,
+
+buisness suits, suit vest, necktie,`,
+VITTORIO_UC: `pale skin, makeup, wrinkles, beard, scar everywhere, long chin, forked eyebrows, moles, unnatural hair, long hair, wavy hair, curly hair, tsurime, accessory, `,
+LORENZO: `1 boy, mature male, aged up, adult, toned, silver hair, hair slicked back, pale skin, blue eyes, narrow eyes, half-closed eyes, short face, handsome, perfect face, perfect anatomy, very tall,
+
+-2::long chin, long-shaped face, narrow face, forked eyebrows::,
+
+business suits, suit vest, necktie,`,
+LORENZO_UC: `makeup, wrinkles, beard, scar everywhere, long chin, forked eyebrows, moles, unnatural hair, long hair, wavy hair, curly hair, accessory, narrow face, long-shaped face,`,
+MARIA: `1 girl,  ::adult, aged up::, mature female, skinny, perfect face, perfect anatomy, long hair, ::straight hair::, 2::blunt bangs::, 2::bangs::, black hair, black eyes, tareme, ::dead eyes::, narrow face, thick eyebrows, straight eyebrows, pale skin,
+
+loose top, loose pants, mexican fashion, gloves, many accessories, silver accessories, full gloves,`,
+NACHO: `1 boy,  ::adult, aged up::, handsome, perfect face, perfect anatomy, black hair, yellow eyes, tsurime, thin eyebrows, burned scar on a eye, short face, 2::tall::, middle-parted hair, short hair, 0.2::tan::,
+
+-2::long-shaped face, prominent chin::,
+
+buisness suits, white shirt, opened collar, jacket, suit pants, `,
+NACHO_UC: `pale skin, makeup, beard, scar everywhere, long chin, forked eyebrows, moles, red skin, long hair, accessory, narrow face, long-shaped face, tie, necktie,`,
+KIRILL: `1 boy, solo, ::adult, aged up::, mature male, ::muscular::, handsome, perfect face, perfect anatomy,  ::pale skin::,grey-blue eyes, black hair, long buzz cut, bara, tired eyes, tall, half-closed eyes, double eyelids, tear troughs, big pectorals, broad shoulder,
+
+-0.5::prominent chin:::, -3::forked eyebrows::,
+
+black turtleneck knit, black suit pants,`,
+KIRILL_UC: `necklace, beard, moles, forked eyebrows, long-shaped face, wrinkles, long chin, heavy jowls, long hair, glasses, prominent chin, pale eyes, sanpaku, smile, simple eyes, sad, wide face, scar, wide eyes, long nose, shiny eyes, wide nose, choker, tan, jewel, freckles, small pupils, hair strands, tear, body hair, blush, 0.2::crew cut::, nipples, ::shaved head::,`,
+NARUSE: `1 boy, solo, ::adult, aged up::, mature male, ::toned::, broad shoulders, handsome, perfect face, perfect anatomy, black eyes, small pupils, tired eyes, 2::narrow eyes::, ash-brown hair, short hair, ponytail, ^^, broad shoulders, 0.2::tan::, glasses,
+
+-0.5::prominent chin:::, -3::forked eyebrows, thick eyebrows::, 2::thin eyebrows::,
+
+baggy suits, business suits, oversized jacket, gold-white square analogue watch on wrist,`,
+NARUSE_UC: `necklace, beard, moles, forked eyebrows, long-shaped face, 2::wrinkles::, long chin, heavy jowls, long hair, glasses, prominent chin, pale eyes, sanpaku, simple eyes, sad, wide face, scar, wide eyes, long nose, shiny eyes, wide nose, choker, particles, jewel, freckles, small pupils, hair strands, tear, body hair,  nipples, red skin, red lips, pale skin, brown skin,`,
+};
+const PAIR_URL = "https://dpla6274.github.io/mRIo/index.html";
+
+/* ---------- page switching by #hash ---------- */
+const sheet = document.querySelector(".sheet");
+const PAGES = ["main", "prompt", "pair"];
+function show() {
+  const p = location.hash.slice(1);
+  const page = PAGES.includes(p) ? p : "main";
+  sheet.dataset.page = page;
+  document.querySelectorAll(".tab").forEach(t => t.classList.toggle("current", t.dataset.p === page));
+  postit.classList.remove("revealed");
+}
+addEventListener("hashchange", show);
+
+/* ---------- copy ---------- */
+const status = document.getElementById("status");
+async function copyText(t) {
+  try { await navigator.clipboard.writeText(t); return; } catch (e) {}
+  const ta = Object.assign(document.createElement("textarea"), { value: t });
+  ta.style.cssText = "position:fixed;opacity:0"; document.body.append(ta); ta.select();
+  document.execCommand("copy"); ta.remove();
+}
+document.querySelectorAll(".copy").forEach(b => b.addEventListener("click", async () => {
+  await copyText(P[b.dataset.k]);
+  b.classList.add("on"); clearTimeout(b._t); b._t = setTimeout(() => b.classList.remove("on"), 900);
+  status.textContent = b.dataset.k.replace("_UC", " UC") + " 복사됨";
+}));
+
+/* ---------- pair post-it: desktop = hover swaps + click goes; touch = 1st tap swaps, 2nd goes ---------- */
+const postit = document.getElementById("postit");
+const touch = matchMedia("(hover: none)").matches;
+postit.addEventListener("click", () => {
+  if (touch && !postit.classList.contains("revealed")) { postit.classList.add("revealed"); return; }
+  location.href = PAIR_URL;
+});
+show();
+</script>
+</body>
+</html>
