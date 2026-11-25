@@ -7,7 +7,7 @@
 <meta name="description" content="dpla">
 <meta property="og:title" content="dpla">
 <meta name="theme-color" content="#000000">
-<link rel="preload" href="assets/sheet.jpg" as="image">
+<link rel="preload" href="assets/sheet.webp" as="image">
 <link rel="preload" href="assets/griun.woff" as="font" type="font/woff" crossorigin>
 <style>
   @font-face { font-family: "Griun"; src: url("assets/griun.woff") format("woff"); font-display: swap; }
@@ -28,22 +28,24 @@
   /* ---------- sheet: clip + paper photo ---------- */
   .sheet {
     position: relative; width: min(86vw, 82svh * 404 / 506, 600px); aspect-ratio: 404 / 506;
-    background: url("assets/sheet.jpg") center / 100% 100% no-repeat;
     container-type: inline-size; isolation: isolate;
     transform: translateX(-3%);               /* keep sheet + tabs visually centred */
     --u: 0.09406cqw;                          /* 1/1000 of the paper width */
   }
-  .paper { position: absolute; left: 2.97%; top: 22.53%; width: 94.06%; height: 75.1%; isolation: isolate; }
+  .photo { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; user-select: none; }
+  .paper { z-index: 2; position: absolute; left: 2.97%; top: 22.53%; width: 94.06%; height: 75.1%; isolation: isolate; }
 
   /* ---------- index tabs ---------- */
   .tabs {
-    position: absolute; left: calc(97.03% - 3px); top: 22.53%; height: 75.1%;
+    --tuck: calc(24 * var(--u));              /* part of every tab hidden under the paper */
+    position: absolute; left: calc(97.03% - var(--tuck)); top: 22.53%; height: 75.1%;
     display: flex; flex-direction: column; justify-content: center; gap: calc(14 * var(--u));
   }
   .tab {
     --w: calc(96 * var(--u)); --adh: calc(90 * var(--u));
+    position: relative; z-index: 0;
     display: flex; align-items: center; justify-content: center;
-    width: calc(var(--w) + 3px); padding: calc(20 * var(--u)) 0 calc(20 * var(--u)) 3px;
+    width: calc(var(--w) + var(--tuck)); padding: calc(20 * var(--u)) 0 calc(20 * var(--u)) var(--tuck);
     background: rgb(var(--c)); border-radius: 0 calc(12 * var(--u)) calc(12 * var(--u)) 0;
     transition: transform .2s ease;
   }
@@ -54,8 +56,9 @@
   .tab[data-p="pair"]   { --c: 216 206 178; }
   /* the open page shows its tab's adhesive part lying on the paper */
   .tab.current {
-    width: calc(var(--w) + var(--adh) + 3px); margin-left: calc(-1 * var(--adh)); padding-left: calc(var(--adh) + 3px);
-    background: linear-gradient(90deg, rgb(var(--c) / .6) 0 calc(var(--adh) + 3px), rgb(var(--c)) calc(var(--adh) + 3px));
+    z-index: 3;                               /* stuck on top of the open page */
+    width: calc(var(--w) + var(--adh)); margin-left: calc(var(--tuck) - var(--adh)); padding-left: var(--adh);
+    background: linear-gradient(90deg, rgb(var(--c) / .6) 0 var(--adh), rgb(var(--c)) var(--adh));
   }
   @media (hover: hover) { .tab:not(.current):hover { transform: translateX(calc(4 * var(--u))); } }
 
@@ -97,7 +100,7 @@
   .copy::before {
     content: ""; position: absolute; z-index: -1; left: -.16em; right: -.16em; top: .02em; bottom: -.12em;
     background: url("assets/hl2.png") center / 100% 100% no-repeat;
-    clip-path: inset(0 100% 0 0); transition: clip-path .35s cubic-bezier(.3, .6, .4, 1);
+    clip-path: inset(0 100% 0 0); transition: clip-path .5s cubic-bezier(.3, .6, .4, 1);
   }
   .copy.uc::before { background-image: url("assets/hl3.png"); }
   .copy.on::before { clip-path: inset(0 0 0 0); }
@@ -133,6 +136,7 @@
 </head>
 <body>
 <main class="sheet" data-page="main">
+  <img class="photo" src="assets/sheet.webp" alt="" draggable="false">
   <div class="paper">
 
     <section class="page main" aria-label="MAIN">
