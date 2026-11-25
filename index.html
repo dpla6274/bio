@@ -47,7 +47,6 @@
     display: flex; align-items: center; justify-content: center;
     width: calc(var(--w) + var(--tuck)); padding: calc(20 * var(--u)) 0 calc(20 * var(--u)) var(--tuck);
     background: rgb(var(--c)); border-radius: 0 calc(12 * var(--u)) calc(12 * var(--u)) 0;
-    transition: transform .2s ease;
   }
   .tab img { width: calc(46 * var(--u)); height: auto; display: block; pointer-events: none; }
   .tab[data-p="main"]   { --c: 214 210 196; }
@@ -60,7 +59,6 @@
     width: calc(var(--w) + var(--adh)); margin-left: calc(var(--tuck) - var(--adh)); padding-left: var(--adh);
     background: linear-gradient(90deg, rgb(var(--c) / .6) 0 var(--adh), rgb(var(--c)) var(--adh));
   }
-  @media (hover: hover) { .tab:not(.current):hover { transform: translateX(calc(4 * var(--u))); } }
 
   /* ---------- pages ---------- */
   .page {
