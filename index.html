@@ -15,6 +15,7 @@
 <meta name="twitter:image" content="https://dpla6274.github.io/bio/assets/og.jpg">
 <meta name="theme-color" content="#000000">
 <link rel="preload" href="assets/sheet.webp" as="image">
+<link rel="preload" href="assets/sheet-main.webp" as="image">
 <link rel="preload" href="assets/griun.woff" as="font" type="font/woff" crossorigin>
 <style>
   @font-face { font-family: "Griun"; src: url("assets/griun.woff") format("woff"); font-display: swap; }
@@ -89,9 +90,21 @@
   .hl.v2::before { background-image: url("assets/hl2.png"); }
   .hl.v3::before { background-image: url("assets/hl3.png"); }
 
-  /* MAIN */
-  .main { font-size: calc(38 * var(--u)); line-height: 1.55; }
-  .main p + p { margin-top: .7em; }
+  /* MAIN: printed baggage-tag paper, handwriting sits on its rules */
+  @font-face { font-family: "MonoDate"; src: url("assets/mono-date.woff") format("woff"); font-display: swap; }
+  .photo-main { display: none; }
+  .sheet[data-page="main"] .photo-main { display: block; }
+  .sheet[data-page="main"] .photo:not(.photo-main) { visibility: hidden; }
+  .sheet[data-page="main"] .page.main { display: block; }
+  .page.main { padding: 0; }
+  .main .lines { position: absolute; left: calc(98.42 * var(--u)); top: calc(193.03 * var(--u));
+    font-size: calc(29.00 * var(--u)); line-height: calc(42.18 * var(--u)); white-space: nowrap; }
+  .main .ln { height: calc(42.18 * var(--u)); }
+  .stamp { position: absolute; left: calc(732.86 * var(--u)); top: calc(96.66 * var(--u));
+    width: calc(137.08 * var(--u)); height: calc(137.08 * var(--u)); border-radius: 50%; }
+  .date { position: absolute; right: calc(87.87 * var(--u)); top: calc(913.88 * var(--u));
+    font-family: "MonoDate", monospace; font-weight: 700; font-size: calc(35.15 * var(--u)); line-height: 1;
+    color: rgb(192 52 44); letter-spacing: .02em; opacity: .9; }
 
   /* PROMPT */
   .prompt ul { list-style: none; }
@@ -179,14 +192,30 @@
 <body>
 <main class="sheet" data-page="main">
   <img class="photo" src="assets/sheet.webp" alt="" draggable="false">
+  <img class="photo photo-main" src="assets/sheet-main.webp" alt="" draggable="false">
   <div class="paper">
 
     <section class="page main" aria-label="MAIN">
-      <p><span class="hl">성인 여성</span><br>성인 여성만 받습니다.</p>
-      <p><span class="hl v2">극오픈 | 이입</span><br><span class="hl v3">1T1D 및 추가 온리 배려 X</span><br>탐라 내 자연발생 온리만 배려해 드리는 편입니다.</p>
-      <p>로그, 짤뽑, 제작 +기타<br>케이브덕, 티팟, 유니챗 (+마리나라)<br>고정 페르소나 하나만 사용합니다.</p>
-      <p><span class="hl v2">근친 등 비윤리적 소재 언급 O</span><br>스캇 제외 NG 없습니다.</p>
-      <p>FUB FREE, 재연결 O</p>
+      <!-- 한 줄 = 인쇄된 줄 하나 (빈 줄도 한 칸). 형광펜은 <span class="hl">문구</span> -->
+      <div class="lines">
+        <div class="ln"><span class="hl">성인 여성</span></div>
+        <div class="ln">성인 여성만 받습니다.</div>
+        <div class="ln"></div>
+        <div class="ln"><span class="hl v2">극오픈 | 이입</span></div>
+        <div class="ln"><span class="hl v3">1T1D 및 추가 온리 배려 X</span></div>
+        <div class="ln">탐라 내 자연발생 온리만 배려해 드리는 편입니다.</div>
+        <div class="ln"></div>
+        <div class="ln">로그, 짤뽑, 제작 +기타</div>
+        <div class="ln">케이브덕, 티팟, 유니챗 (+마리나라)</div>
+        <div class="ln">고정 페르소나 하나만 사용합니다.</div>
+        <div class="ln"></div>
+        <div class="ln"><span class="hl v2">근친 등 비윤리적 소재 언급 O</span></div>
+        <div class="ln">스캇 제외 NG 없습니다.</div>
+        <div class="ln"></div>
+        <div class="ln">FUB FREE, 재연결 O</div>
+      </div>
+      <a class="stamp" href="https://x.com/DPLA_6274" target="_blank" rel="noopener" aria-label="@DPLA_6274"></a>
+      <span class="date" id="today"></span>
     </section>
 
     <section class="page prompt" aria-label="PROMPT">
@@ -313,6 +342,10 @@ postit.addEventListener("click", () => {
 });
 /* ♥: show each banner's alt text on hover */
 document.querySelectorAll(".friends a").forEach(a => { const i = a.querySelector("img"); if (i) a.dataset.name = i.alt; });
+
+/* MAIN: today's date printed at the bottom */
+(() => { const d = new Date(), p = n => String(n).padStart(2, "0");
+  document.getElementById("today").textContent = `№  E ${p(d.getFullYear() % 100)}-${p(d.getMonth() + 1)}-${p(d.getDate())}`; })();
 
 /* ♥: "상시교환" tape goes in the slot the ♥ tab would cover, and is stuck on top of the tab */
 const grid = document.querySelector(".friends"), slot = grid.querySelector(".tape-slot");
