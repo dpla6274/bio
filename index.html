@@ -142,12 +142,29 @@
   .tab[data-p="link"] { --c: 226 205 205; }
   .tab[data-p="link"] img { width: calc(40 * var(--u)); }
   .page.link { mix-blend-mode: normal; justify-content: flex-start;
-    padding: calc(60 * var(--u)) calc(110 * var(--u)) calc(70 * var(--u)) calc(60 * var(--u));
+    padding: calc(40 * var(--u));
     overflow-y: auto; scrollbar-width: none; }
   .page.link::-webkit-scrollbar { display: none; }
-  .friends { display: grid; grid-template-columns: 1fr 1fr; gap: calc(30 * var(--u)); align-content: start; }
+  .friends { display: grid; grid-template-columns: 1fr 1fr; gap: calc(16 * var(--u)); align-content: start; margin: auto 0; }
   /* every banner sits in the same frame (200:70); the picture is cropped to fit */
-  .friends a { display: block; aspect-ratio: 200 / 70; overflow: hidden; }
+  .friends a { display: block; aspect-ratio: 200 / 70; overflow: hidden; position: relative; text-decoration: none; border-radius: calc(10 * var(--u)); }
+  .friends a::after {
+    content: attr(data-name); position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: rgb(0 0 0 / .42); color: #fff; font-size: calc(32 * var(--u)); font-weight: 700;
+    font-family: "Malgun Gothic", "맑은 고딕", "NanumGothic", "나눔고딕", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+    opacity: 0; transition: opacity .2s ease;
+  }
+  .friends a.on::after { opacity: 1; }
+  @media (hover: hover) { .friends a:hover::after { opacity: 1; } }
+  .friends.one { grid-template-columns: 1fr; }
+  /* tape in the slot the ♥ tab would cover */
+  .friends .tape-slot, .friends .spacer { aspect-ratio: 200 / 70; }
+  .tape {
+    position: absolute; z-index: 5; display: none; align-items: center; justify-content: center;
+    background: url("assets/tape.webp") center / 100% 100% no-repeat;
+    font-size: calc(38 * var(--u)); color: var(--ink); pointer-events: none; box-sizing: border-box;
+  }
+  .sheet[data-page="link"] .tape.ready { display: flex; }
   .friends img {
     width: 100%; height: 100%; display: block; object-fit: cover;
     object-position: var(--pos, 50% 50%);              /* which part stays: x% y% */
@@ -192,6 +209,7 @@
           style="--pos: 30% 40%; --zoom: 1.3"   1.3배 확대해서 그 부분 위주로
         -->
         <a href="https://p3e9k.naru.pub/#" target="_blank" rel="noopener"><img src="assets/p3e9k.jpg" alt="빈계정" style="--pos: 50% 5%"></a>
+        <span class="tape-slot"></span>
       </div>
     </section>
 
@@ -204,6 +222,7 @@
 
   </div>
 
+  <div class="tape" aria-hidden="true">상시교환</div>
   <nav class="tabs">
     <a class="tab" data-p="main" href="#main"><img src="assets/tab-main.png" alt="MAIN"></a>
     <a class="tab" data-p="ask" href="https://asked.kr/profile/DDPPLLAA?lang=ko" target="_blank" rel="noopener"><img src="assets/tab-ask.png" alt="ASK"></a>
@@ -288,9 +307,46 @@ postit.addEventListener("click", () => {
   window.open(PAIR_URL, "_blank", "noopener");
   postit.classList.remove("revealed");
 });
+/* ♥: show each banner's alt text on hover */
+document.querySelectorAll(".friends a").forEach(a => { const i = a.querySelector("img"); if (i) a.dataset.name = i.alt; });
+
+/* ♥: "상시교환" tape goes in the slot the ♥ tab would cover, and is stuck on top of the tab */
+const grid = document.querySelector(".friends"), slot = grid.querySelector(".tape-slot");
+const tapeEl = document.querySelector(".tape"), linkPage = document.querySelector(".page.link");
+function layTape() {
+  const r = slot.getBoundingClientRect(), sr = sheet.getBoundingClientRect(), heart = document.querySelector('.tab[data-p="link"]').getBoundingClientRect();
+  const left = r.left - sr.left, right = r.right - sr.left;          // same size as the slot, just layered above the ♥ tab
+  const h = r.height * .82;
+  Object.assign(tapeEl.style, { left: left + "px", width: (right - left) + "px", height: h + "px", top: (r.top - sr.top + (r.height - h) / 2) + "px" });
+  tapeEl.classList.add("ready");
+}
+function placeTape() {
+  if (sheet.dataset.page !== "link") return;
+  const heart = document.querySelector('.tab[data-p="link"]');
+  const banners = [...grid.querySelectorAll("a")];
+  let want = -1;
+  for (let k = 0; k < 6; k++) {
+    const first = grid.firstElementChild.getBoundingClientRect();
+    const pitch = first.height + parseFloat(getComputedStyle(grid).rowGap);
+    const h = heart.getBoundingClientRect(), mid = h.top + h.height / 2;
+    const idx = Math.max(0, Math.floor((mid - first.top) / pitch)) * 2 + 1;   // right-hand column of that row
+    if (idx === want) break;
+    want = idx;
+    const before = banners.slice(0, idx), after = banners.slice(idx), fill = [];
+    for (let i = before.length; i < idx; i++) fill.push(Object.assign(document.createElement("span"), { className: "spacer" }));
+    grid.replaceChildren(...before, ...fill, slot, ...after);
+  }
+  layTape();
+}
+addEventListener("resize", placeTape);
+addEventListener("hashchange", () => requestAnimationFrame(placeTape));
+linkPage.addEventListener("scroll", layTape);
+document.fonts && document.fonts.ready.then(placeTape);
+
 /* touch: tapping anywhere outside the post-it turns it back to the kaomoji */
 document.addEventListener("click", e => { if (!postit.contains(e.target)) postit.classList.remove("revealed"); });
 show();
+requestAnimationFrame(placeTape);
 </script>
 </body>
 </html>
