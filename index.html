@@ -6,6 +6,13 @@
 <title>dpla</title>
 <meta name="description" content="dpla">
 <meta property="og:title" content="dpla">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://dpla6274.github.io/bio/">
+<meta property="og:image" content="https://dpla6274.github.io/bio/assets/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dpla6274.github.io/bio/assets/og.jpg">
 <meta name="theme-color" content="#000000">
 <link rel="preload" href="assets/sheet.webp" as="image">
 <link rel="preload" href="assets/griun.woff" as="font" type="font/woff" crossorigin>
@@ -69,7 +76,8 @@
   }
   .sheet[data-page="main"] .page.main,
   .sheet[data-page="prompt"] .page.prompt,
-  .sheet[data-page="pair"] .page.pair { display: flex; }
+  .sheet[data-page="pair"] .page.pair,
+  .sheet[data-page="link"] .page.link { display: flex; }
 
   /* highlighter: real marker-stroke texture behind the text */
   .hl { position: relative; white-space: nowrap; }
@@ -130,6 +138,16 @@
   .postit.revealed .kao { opacity: 0; } .postit.revealed .pop { opacity: 1; }
   @media (hover: hover) { .postit:hover .kao { opacity: 0; } .postit:hover .pop { opacity: 1; } }
 
+  /* ♥ friends' banners */
+  .tab[data-p="link"] { --c: 226 205 205; }
+  .tab[data-p="link"] img { width: calc(40 * var(--u)); }
+  .page.link { mix-blend-mode: normal; justify-content: flex-start;
+    padding: calc(70 * var(--u)) calc(110 * var(--u)) calc(70 * var(--u)) calc(60 * var(--u));
+    overflow-y: auto; scrollbar-width: none; }
+  .page.link::-webkit-scrollbar { display: none; }
+  .friends { display: grid; grid-template-columns: 1fr 1fr; gap: calc(30 * var(--u)) calc(30 * var(--u)); margin: auto 0; }
+  .friends a { display: block; line-height: 0; }
+  .friends img { width: 100%; height: auto; display: block; }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 </style>
 </head>
@@ -159,6 +177,14 @@
       <p class="sr" aria-live="polite" id="status"></p>
     </section>
 
+    <section class="page link" aria-label="BANNER">
+      <div class="friends">
+        <!-- 친구 배너는 이 줄 아래에 한 줄씩 추가:
+        <a href="친구 사이트 주소" target="_blank" rel="noopener"><img src="배너 이미지 주소" alt="친구 이름"></a>
+        -->
+      </div>
+    </section>
+
     <section class="page pair" aria-label="PAIR">
       <button class="postit" id="postit" aria-label="9/22. Assignment begins.">
         <span class="kao">(*´∀`*)♬ ♥ φ(・ω・｀)</span>
@@ -173,6 +199,7 @@
     <a class="tab" data-p="ask" href="https://asked.kr/profile/DDPPLLAA?lang=ko" target="_blank" rel="noopener"><img src="assets/tab-ask.png" alt="ASK"></a>
     <a class="tab" data-p="prompt" href="#prompt"><img src="assets/tab-prompt.png" alt="PROMPT"></a>
     <a class="tab" data-p="pair" href="#pair"><img src="assets/tab-pair.png" alt="PAIR"></a>
+    <a class="tab" data-p="link" href="#link"><img src="assets/tab-heart.png" alt="BANNER"></a>
   </nav>
 </main>
 
@@ -219,7 +246,7 @@ const PAIR_URL = "https://dpla6274.github.io/mRIo/index.html";
 
 /* ---------- page switching by #hash ---------- */
 const sheet = document.querySelector(".sheet");
-const PAGES = ["main", "prompt", "pair"];
+const PAGES = ["main", "prompt", "pair", "link"];
 function show() {
   const p = location.hash.slice(1);
   const page = PAGES.includes(p) ? p : "main";
