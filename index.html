@@ -24,7 +24,8 @@
 
   :root { --ink: #262428; }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { height: 100%; background: #000; }
+  html { background: #000; }
+  body { background: #000; }
   body {
     min-height: 100svh; display: flex; align-items: center; justify-content: center;
     font-family: "Griun", "GriunFull", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
@@ -126,7 +127,8 @@
     transform: rotate(2deg); border: 0; font: inherit; color: inherit;
   }
   .postit span {
-    position: absolute; left: 0; right: 0; top: 60%; transform: translateY(-75%);
+    position: absolute; left: 0; right: 0; top: 60%; line-height: 1;
+    transform: translate(var(--dx, 0em), calc(-50% + var(--dy, 0em)));
     text-align: center; white-space: nowrap; transition: opacity .25s ease;
   }
   .postit .kao { font-size: calc(44 * var(--u)); }
@@ -134,6 +136,7 @@
     font-family: "Cormorant SBI", "Cormorant Garamond", Georgia, serif; font-style: italic; font-weight: 600;
     font-size: calc(54 * var(--u)); letter-spacing: -.025em; color: #2d2346;
     text-shadow: 0 0 .5px rgb(45 35 70 / .55); opacity: 0;
+    --dx: .03em; --dy: -.2em;                   /* optical match with the kaomoji (measured) */
   }
   .postit.revealed .kao { opacity: 0; } .postit.revealed .pop { opacity: 1; }
   @media (hover: hover) { .postit:hover .kao { opacity: 0; } .postit:hover .pop { opacity: 1; } }
