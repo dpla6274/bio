@@ -142,12 +142,17 @@
   .tab[data-p="link"] { --c: 226 205 205; }
   .tab[data-p="link"] img { width: calc(40 * var(--u)); }
   .page.link { mix-blend-mode: normal; justify-content: flex-start;
-    padding: calc(70 * var(--u)) calc(110 * var(--u)) calc(70 * var(--u)) calc(60 * var(--u));
+    padding: calc(60 * var(--u)) calc(110 * var(--u)) calc(70 * var(--u)) calc(60 * var(--u));
     overflow-y: auto; scrollbar-width: none; }
   .page.link::-webkit-scrollbar { display: none; }
-  .friends { display: grid; grid-template-columns: 1fr 1fr; gap: calc(30 * var(--u)) calc(30 * var(--u)); margin: auto 0; }
-  .friends a { display: block; line-height: 0; }
-  .friends img { width: 100%; height: auto; display: block; }
+  .friends { display: grid; grid-template-columns: 1fr 1fr; gap: calc(30 * var(--u)); align-content: start; }
+  /* every banner sits in the same frame (200:70); the picture is cropped to fit */
+  .friends a { display: block; aspect-ratio: 200 / 70; overflow: hidden; }
+  .friends img {
+    width: 100%; height: 100%; display: block; object-fit: cover;
+    object-position: var(--pos, 50% 50%);              /* which part stays: x% y% */
+    transform: scale(var(--zoom, 1)); transform-origin: var(--pos, 50% 50%);
+  }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 </style>
 </head>
@@ -179,10 +184,14 @@
 
     <section class="page link" aria-label="BANNER">
       <div class="friends">
-        <!-- 친구 배너는 이 줄 아래에 한 줄씩 추가:
-        <a href="친구 사이트 주소" target="_blank" rel="noopener"><img src="assets/파일이름.png" alt="친구 이름"></a>
+        <!-- 친구 배너는 이 줄 아래에 한 줄씩 추가 (위에서부터 두 칸씩 쌓임):
+        <a href="친구 사이트 주소" target="_blank" rel="noopener"><img src="assets/파일.jpg" alt="이름"></a>
+
+        잘리는 부분 바꾸기: img에 style 추가
+          style="--pos: 50% 20%"            가로% 세로%  (0% = 왼쪽/위, 100% = 오른쪽/아래)
+          style="--pos: 30% 40%; --zoom: 1.3"   1.3배 확대해서 그 부분 위주로
         -->
-        <a href="https://p3e9k.naru.pub/#" target="_blank" rel="noopener"><img src="assets/p3e9k.jpg" alt="빈계정"></a>
+        <a href="https://p3e9k.naru.pub/#" target="_blank" rel="noopener"><img src="assets/p3e9k.jpg" alt="빈계정" style="--pos: 50% 15%></a>
       </div>
     </section>
 
