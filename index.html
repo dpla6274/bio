@@ -16,6 +16,7 @@
 <meta name="theme-color" content="#000000">
 <link rel="preload" href="assets/sheet.webp" as="image">
 <link rel="preload" href="assets/sheet-main.webp" as="image">
+<link rel="preload" href="assets/sheet-prompt.webp" as="image">
 <link rel="preload" href="assets/griun.woff" as="font" type="font/woff" crossorigin>
 <style>
   @font-face { font-family: "Griun"; src: url("assets/griun.woff") format("woff"); font-display: swap; }
@@ -95,6 +96,7 @@
   .photo-main { display: none; }
   .sheet[data-page="main"] .photo-main { display: block; }
   .sheet[data-page="main"] .photo:not(.photo-main) { visibility: hidden; }
+  .sheet[data-page="main"] .photo-prompt { visibility: hidden; }
   .sheet[data-page="main"] .page.main { display: block; }
   .page.main { padding: 0; }
   .main .lines { position: absolute; left: calc(98.42 * var(--u)); top: calc(193.03 * var(--u));
@@ -107,13 +109,14 @@
     color: rgb(192 52 44); letter-spacing: .02em; opacity: .9; }
 
   /* PROMPT */
-  .prompt ul { list-style: none; }
-  .prompt li {
-    display: flex; align-items: center; justify-content: space-between; height: calc(112 * var(--u));
-    border-bottom: 1px solid rgb(150 148 142 / .75);
-  }
-  .prompt li:last-child, .prompt li.joined { border-bottom: 0; }
-  .prompt .left { display: flex; align-items: baseline; gap: calc(30 * var(--u)); }
+  @font-face { font-family: "MonoB"; src: url("assets/mono-b.woff") format("woff"); font-display: swap; }
+  .photo-prompt { display: none; }
+  .sheet[data-page="prompt"] .photo-prompt { display: block; }
+  .sheet[data-page="prompt"] .photo:not(.photo-prompt) { visibility: hidden; }
+  .sheet[data-page="prompt"] .page.prompt { display: block; }
+  .page.prompt { padding: 0; }
+  .copy.p { position: absolute; font-family: "MonoB", monospace; font-weight: 700; font-size: calc(35.15 * var(--u));
+    line-height: 1; color: #2c2a30; opacity: .93; }
   .copy {
     font: inherit; color: inherit; background: none; border: 0; cursor: pointer; padding: 0;
     font-size: calc(58 * var(--u)); line-height: 1; position: relative;
@@ -193,6 +196,7 @@
 <main class="sheet" data-page="main">
   <img class="photo" src="assets/sheet.webp" alt="" draggable="false">
   <img class="photo photo-main" src="assets/sheet-main.webp" alt="" draggable="false">
+  <img class="photo photo-prompt" src="assets/sheet-prompt.webp" alt="" draggable="false">
   <div class="paper">
 
     <section class="page main" aria-label="MAIN">
@@ -219,15 +223,19 @@
     </section>
 
     <section class="page prompt" aria-label="PROMPT">
-      <ul>
-        <li><button class="copy" data-k="PERSONA">PERSONA</button><button class="copy uc" data-k="PERSONA_UC">UC</button></li>
-        <li><button class="copy" data-k="VITTORIO">VITTORIO</button><button class="copy uc" data-k="VITTORIO_UC">UC</button></li>
-        <li><button class="copy" data-k="LORENZO">LORENZO</button><button class="copy uc" data-k="LORENZO_UC">UC</button></li>
-        <li class="joined"><button class="copy" data-k="NACHO">NACHO</button><button class="copy uc" data-k="NACHO_UC">UC</button></li>
-        <li><span class="left"><button class="copy" data-k="MARIA">MARIA</button><span class="note">나초방 마리아 옷 포함 통프롬</span></span></li>
-        <li><button class="copy" data-k="KIRILL">KIRILL</button><button class="copy uc" data-k="KIRILL_UC">UC</button></li>
-        <li><button class="copy" data-k="NARUSE">NARUSE</button><button class="copy uc" data-k="NARUSE_UC">UC</button></li>
-      </ul>
+      <button class="copy p" data-k="PERSONA" style="left:calc(149.38*var(--u));top:calc(340.95*var(--u))">PERSONA</button>
+      <button class="copy p uc" data-k="PERSONA_UC" style="right:calc(552.72*var(--u));top:calc(340.95*var(--u))">UC</button>
+      <button class="copy p" data-k="VITTORIO" style="left:calc(561.51*var(--u));top:calc(340.95*var(--u))">VITTORIO</button>
+      <button class="copy p uc" data-k="VITTORIO_UC" style="right:calc(140.60*var(--u));top:calc(340.95*var(--u))">UC</button>
+      <button class="copy p" data-k="LORENZO" style="left:calc(149.38*var(--u));top:calc(437.61*var(--u))">LORENZO</button>
+      <button class="copy p uc" data-k="LORENZO_UC" style="right:calc(552.72*var(--u));top:calc(437.61*var(--u))">UC</button>
+      <button class="copy p" data-k="KIRILL" style="left:calc(561.51*var(--u));top:calc(437.61*var(--u))">KIRILL</button>
+      <button class="copy p uc" data-k="KIRILL_UC" style="right:calc(140.60*var(--u));top:calc(437.61*var(--u))">UC</button>
+      <button class="copy p" data-k="NACHO" style="left:calc(149.38*var(--u));top:calc(534.27*var(--u))">NACHO</button>
+      <button class="copy p uc" data-k="NACHO_UC" style="right:calc(552.72*var(--u));top:calc(534.27*var(--u))">UC</button>
+      <button class="copy p" data-k="MARIA" style="left:calc(561.51*var(--u));top:calc(534.27*var(--u))">MARIA</button>
+      <button class="copy p" data-k="NARUSE" style="left:calc(149.38*var(--u));top:calc(630.93*var(--u))">NARUSE</button>
+      <button class="copy p uc" data-k="NARUSE_UC" style="right:calc(552.72*var(--u));top:calc(630.93*var(--u))">UC</button>
       <p class="sr" aria-live="polite" id="status"></p>
     </section>
 
